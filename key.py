@@ -7,6 +7,7 @@ class Key:
         self.key = None
         self.hashedKey = None
     
+    #Generates a random key that is 32 digits long
     def generateKey(self):
         alphabet = string.ascii_letters + string.digits
         while True:
@@ -16,9 +17,12 @@ class Key:
                     and sum(c.isdigit() for c in key) >= 3):
                 break
         self.key = key
+        return key
 
+    #Takes key and hashes it into a bytes format
     def hashKey(self, key):
         k = key
         encoded = k.encode("utf-8")
         hashed = bcrypt.hashpw(encoded, bcrypt.gensalt())
         self.hashedKey = hashed
+        return hashed
