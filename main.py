@@ -1,25 +1,50 @@
 
-'''
-1. Finish generating keys and encrypt them
-2. Connect to database in python and store keys
-3. Write flask application and host it
-4. Connect flask to database and decrypt keys for api calls
-'''
-
-'''
-Classes - 
-Key Class - to manage key generation, verification and hashing of key
-User input class - to manage user's name, email and date that the user's key is administered
-Database class - manage database connection, inserting and querying
-'''
+from database import Database
 
 
-import time
+from flask import Flask
+from flask_restful import Api, Resource, reqparse
 
-from database import Database 
-#https://devqa.io/encrypt-decrypt-data-python/
+import string
+import bcrypt
+import secrets
+
+app = Flask(__name__)
+api = Api(app)
+
+
+putArgs = reqparse.RequestParser()
+putArgs.add_argument("name" ,type=str, help="Incorrect, name is required!", required=True)
 
 d = Database()
 
+@app.before_first_request
+def before_first_request():
+    d.connectToDatabase() 
 
-#connectToDatabase()
+class ExampleAPI(Resource):
+
+    def get(self, userID, apikey):
+        
+        #Connecting to database
+        dataReturned = d.queryDB(userID)
+        
+        #Preparing keys to be compared
+        try:
+            dbHashedKey = dataReturned[0][0]
+        except:
+            return {"Status": "Access denied", "Message": "Could not find ID in database", "Data": None}, 401
+        dbHashedKey = dbHashedKey.encode('utf-8')
+        apikey = apikey.encode('utf-8')
+        
+        #Return statement to be accessed
+        if (bcrypt.checkpw(apikey, dbHashedKey)):
+            return {"Status": "Access granted", "Message": "Authorized", "Data" : "Super secret data goes here"}
+        else:
+            return {"Status": "Access denied", "Message": "Unauthorized", "Data": None}, 401
+        
+
+api.add_resource(ExampleAPI, "/exampleAPI/<int:userID>/<string:apikey>")
+
+if __name__ == "__main__":
+    app.run(debug=True)
