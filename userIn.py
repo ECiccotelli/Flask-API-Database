@@ -6,6 +6,8 @@ class UserInput:
         self.name = "Default"
         self.email = "default@gmail.com"
         self.date = time.strftime('%Y-%m-%d %H:%M:%S')
+        self.setName()
+        self.setEmail()
 
 
     def setName(self):
