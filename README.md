@@ -16,4 +16,4 @@ This project demonstrates the connectivity of a MySQL database with a Flask API 
 
 ![Unauthorized](images/unauthorized.PNG)
 
-![ID not found](images/ID%not%found.PNG)
+![ID not found](images/ID%20not%20found.PNG)
